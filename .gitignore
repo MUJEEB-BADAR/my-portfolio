@@ -1,0 +1,31 @@
+
+# Database credentials
+/includes/db.php
+
+# Environment secrets
+.env
+.env.*
+
+# Local database exports and backups
+/database/
+/*.sql
+/*.sql.gz
+/*.bak
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# Logs
+*.log
+/error_log
+
+# Editor and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+/create-admin.php
+/README-XAMPP.txt
+# Keep personal CV out of public GitHub repository
+**/Mujeeb Ahmed Badar.pdf
