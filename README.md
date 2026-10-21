@@ -33,7 +33,7 @@ A personal portfolio website built with PHP, MySQL, HTML, CSS, and JavaScript to
 7. Start Apache and MySQL from the XAMPP Control Panel.
 8. Open `http://localhost/my-portfolio/` in your browser.
 
-**Note:** The database schema and local configuration files are not included in this repository yet. The setup steps may need adjustment before another developer can run the project.
+The database table structure is included in `schema.sql`. Import this file into MySQL using phpMyAdmin to create the required tables before running the project.
 
 ## Author
 
