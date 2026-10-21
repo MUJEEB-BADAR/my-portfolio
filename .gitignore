@@ -29,3 +29,4 @@ Thumbs.db
 /README-XAMPP.txt
 # Keep personal CV out of public GitHub repository
 **/Mujeeb Ahmed Badar.pdf
+!/schema.sql
