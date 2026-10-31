@@ -30,7 +30,7 @@ function e($value): string
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Admins | MyPortfolio</title>
+    <title>Manage Admins | MyPortfolio Admin Panel</title>
 
     <style>
         * {

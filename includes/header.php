@@ -27,13 +27,11 @@ $pageDescription = $pageDescription
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top site-nav"><div class="container"><a class="navbar-brand fw-bold" href="index.php">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span><?= e(OWNER_NAME) ?></span>
+</a>
 
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top site-nav">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="index.php">
-            <span class="brand-mark"></span>
-            <?= e(OWNER_NAME) ?><span class="text-accent"></span>
-        </a>
 
         <button class="navbar-toggler" type="button"
                 data-bs-toggle="collapse"

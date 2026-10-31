@@ -4,13 +4,13 @@ require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/db.php';
 
-$pageTitle = 'Projects | ' . OWNER_NAME;
+$pageTitle = 'My Projects | Web Development Portfolio | ' . OWNER_NAME;
 $pageDescription = 'Selected web development projects by Mujeeb Ahmed Badar.';
 
 $projects = [];
 $projectsError = false;
 
-$sql = "SELECT title, slug, description, technologies, category, image
+$sql = "SELECT title, slug, description, technologies, category, image, github_url
         FROM projects
         ORDER BY is_featured DESC, created_at DESC, id DESC";
 
@@ -67,23 +67,25 @@ require __DIR__ . '/includes/header.php';
     }
 
     .projects-page-heading {
-        max-width: 700px;
-        margin: 0 auto 42px;
-    }
+    max-width: 720px;
+    margin: 0 auto 48px;
+}
 
-    .projects-page-heading h2 {
-        color: #f8fafc;
-        font-size: clamp(1.8rem, 4vw, 2.5rem);
-        font-weight: 800;
-        letter-spacing: -0.8px;
-        margin-bottom: 12px;
-    }
+.projects-page-heading h2 {
+    color: #f8fafc;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    margin-bottom: 14px;
+}
 
-    .projects-page-heading p {
-        color: #a5b4cc;
-        line-height: 1.8;
-        margin-bottom: 0;
-    }
+.projects-page-heading p {
+    max-width: 620px;
+    margin: 0 auto;
+    color: #a5b4cc;
+    font-size: 0.98rem;
+    line-height: 1.8;
+}
 
     /* Category Filters */
     .projects-page-section .filter-bar {
@@ -126,16 +128,19 @@ require __DIR__ . '/includes/header.php';
 
     /* Project Cards */
     .projects-page-section .project-card {
-        height: 100%;
-        overflow: hidden;
-        border: 1px solid rgba(148, 163, 184, 0.17);
-        border-radius: 18px;
-        background: linear-gradient(145deg, #141d32, #0d1527);
-        transition:
-            transform 0.3s ease,
-            border-color 0.3s ease,
-            box-shadow 0.3s ease;
-    }
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.17);
+    border-radius: 18px;
+    background: linear-gradient(145deg, #141d32, #0d1527);
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
 
     .projects-page-section .project-card:hover {
         transform: translateY(-7px);
@@ -209,11 +214,13 @@ require __DIR__ . '/includes/header.php';
 
     /* Project Information */
     .projects-page-section .project-content {
-        display: flex;
-        min-height: 280px;
-        flex-direction: column;
-        padding: 24px;
-    }
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 24px;
+    min-height: 340px;
+}
+
 
     .projects-page-section .project-label {
         display: inline-flex;
@@ -242,22 +249,22 @@ require __DIR__ . '/includes/header.php';
     }
 
     .projects-page-section .project-content > p {
-        margin-bottom: 22px;
-        color: #a5b4cc;
-        font-size: 0.92rem;
-        line-height: 1.8;
-        overflow-wrap: anywhere;
-        white-space: normal;
-    }
+    margin-bottom: 22px;
+    color: #a5b4cc;
+    font-size: 0.92rem;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
 
     /* Technology Badges */
     .projects-page-section .tech-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: auto;
-        padding-top: 4px;
-    }
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 4px;
+}
 
     .projects-page-section .tech-tags span {
         display: inline-block;
@@ -272,14 +279,14 @@ require __DIR__ . '/includes/header.php';
     }
 
     .projects-page-section .project-card-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        margin-top: 22px;
-        padding-top: 17px;
-        border-top: 1px solid rgba(148, 163, 184, 0.14);
-    }
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 22px;
+    padding-top: 17px;
+    border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
 
     
 /* View Project Details Button */
@@ -388,6 +395,29 @@ require __DIR__ . '/includes/header.php';
             transition: none;
         }
     }
+    .projects-page-section .project-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.projects-page-section .project-actions .project-details-btn {
+    margin-top: 0;
+}
+
+.projects-page-section .github-button-placeholder {
+    min-height: 45px;
+    width: 100%;
+}
+
+@media (max-width: 575.98px) {
+    .projects-page-section .project-content {
+        min-height: auto;
+        padding: 20px;
+    }
+}
+
 </style>
 
 <section class="page-banner">
@@ -539,18 +569,43 @@ require __DIR__ . '/includes/header.php';
                                     <span class="project-card-category">
                                         <?= e($categoryLabel ?: 'Project') ?>
                                     </span>
-
                                 </div>
+                                <div class="project-actions">
+                                    <a href="project-details.php?slug=<?= e(rawurlencode((string) ($project['slug'] ?? ''))) ?>"
+        class="project-details-btn"
+        aria-label="View details for <?= e($project['title']) ?>"
+    >
+        View Project Details
+        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+    </a>
 
-                                <a
-                                    href="project-details.php?slug=<?= e(rawurlencode((string) ($project['slug'] ?? ''))) ?>"
-                                    class="project-details-btn"
-                                    aria-label="View details for <?= e($project['title']) ?>"
-                                >
-                                    View Project Details
-                                    <i class="bi bi-arrow-right"
-                                       aria-hidden="true"></i>
-                                </a>
+    <?php
+    $githubUrl = trim((string) ($project['github_url'] ?? ''));
+
+    $validGithubUrl = (
+        $githubUrl !== '' &&
+        filter_var($githubUrl, FILTER_VALIDATE_URL) &&
+        strtolower((string) parse_url($githubUrl, PHP_URL_SCHEME)) === 'https' &&
+        strtolower((string) parse_url($githubUrl, PHP_URL_HOST)) === 'github.com'
+    );
+    ?>
+
+    <?php if ($validGithubUrl): ?>
+        <a
+            href="<?= e($githubUrl) ?>"
+            class="project-details-btn github-project-btn"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View source code for <?= e($project['title']) ?> on GitHub"
+        >
+            <i class="bi bi-github" aria-hidden="true"></i>
+            View on GitHub
+            <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+        </a>
+    <?php else: ?>
+        <div class="github-button-placeholder" aria-hidden="true"></div>
+    <?php endif; ?>
+</div>
 
 
                             </div>
@@ -579,11 +634,12 @@ require __DIR__ . '/includes/header.php';
                 <i class="bi bi-folder2-open"
                    aria-hidden="true"></i>
 
-                <h2 class="mt-3">Projects Coming Soon</h2>
+                <h2 class="mt-3">No Projects Available</h2>
 
-                <p class="muted-text mb-0">
-                    Projects added to your portfolio will appear here.
-                </p>
+<p class="muted-text mb-0">
+    There are currently no projects to display.
+    Please check back later.
+</p>
             </div>
 
         <?php endif; ?>

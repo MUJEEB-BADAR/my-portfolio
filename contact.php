@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/functions.php';
 
-$pageTitle = 'Contact | ' . OWNER_NAME;
+$pageTitle = 'Contact Me | Get in Touch | ' . OWNER_NAME;
 require __DIR__ . '/includes/header.php';
 ?>
 
@@ -20,11 +20,11 @@ require __DIR__ . '/includes/header.php';
             <div class="col-lg-5">
                 <div class="glass-card p-4 p-lg-5 h-100">
                     <h2>Contact Information</h2>
-                    <p class="muted-text mt-3">
-                        Send me a message using the form. I'll review
-                        your enquiry and respond if email delivery is
-                        configured correctly.
-                    </p>
+                    <p class="muted-text mt-3 contact-intro">
+    Feel free to contact me for web development opportunities,
+    project enquiries or professional discussions. I'll be
+    happy to review your message and get back to you.
+</p>
 
                     <div class="contact-detail mt-4">
                         <i class="bi bi-envelope"></i>
@@ -49,6 +49,20 @@ require __DIR__ . '/includes/header.php';
                             <p><a href="<?= e(LINKEDIN_URL) ?>" target="_blank" rel="noopener noreferrer">View my LinkedIn profile</a></p>
                         </div>
                     </div>
+
+                    <div class="contact-detail mt-3">
+    <i class="bi bi-github"></i>
+    <div>
+        <h3>GitHub</h3>
+        <p>
+            <a href="https://github.com/MUJEEB-BADAR"
+               target="_blank"
+               rel="noopener noreferrer">
+                View my GitHub profile
+            </a>
+        </p>
+    </div>
+</div>
                 </div>
             </div>
 
@@ -129,5 +143,5 @@ require __DIR__ . '/includes/header.php';
     </div>
 </section>
 
-<script src="js/contact.js"></script>
+
 <?php require __DIR__ . '/includes/footer.php'; ?>

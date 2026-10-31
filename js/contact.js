@@ -36,7 +36,7 @@ $(function () {
             $feedback
                 .removeClass('d-none alert-danger')
                 .addClass('alert-success')
-                .text(response.message || 'Message submitted.');
+                .text(response.message || 'Your message has been sent successfully. Thank you for contacting me.');
 
             if (response.success) {
                 form.reset();
@@ -47,7 +47,7 @@ $(function () {
             }
         })
         .fail(function (xhr, status) {
-            let message = 'Unable to send your message. Please try again.';
+            let message = 'Your message could not be sent. Please try again later.';
 
             if (xhr.responseJSON && xhr.responseJSON.message) {
                 message = xhr.responseJSON.message;

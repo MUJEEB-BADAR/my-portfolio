@@ -1,6 +1,15 @@
-
 <?php
 require_once __DIR__ . '/includes/auth.php';
+
+// Only Super Admin can access Login History.
+if (
+    !isset($_SESSION['admin_role']) ||
+    $_SESSION['admin_role'] !== 'super_admin'
+) {
+    http_response_code(403);
+    exit('Access Denied: You are not authorized to access this page.');
+}
+
 require_once __DIR__ . '/includes/db.php';
 
 function e($value): string
@@ -148,7 +157,7 @@ $recordCount = $records ? mysqli_num_rows($records) : 0;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login History | MyPortfolio Admin</title>
+    <title>Login History | MyPortfolio Admin Panel</title>
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"

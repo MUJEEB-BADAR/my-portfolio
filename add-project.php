@@ -1,8 +1,8 @@
-
-
 <?php
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
+
+
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -34,6 +34,8 @@ $slug = '';
 $description = '';
 $technologies = '';
 $category = 'fullstack';
+$githubUrl = '';
+$isFeatured = 1;
 
 if (isset($_GET['added']) && $_GET['added'] === '1') {
     $message = 'Project added successfully!';
@@ -52,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit('Security check failed. Please reload the form and try again.');
     }
 
-    $fields = ['title', 'slug', 'description', 'technologies', 'category'];
+    $fields = ['title', 'slug', 'description', 'technologies', 'category', 'github_url'];
 
     foreach ($fields as $field) {
         if (!isset($_POST[$field]) || !is_string($_POST[$field])) {
@@ -63,10 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $title = trim($_POST['title'] ?? '');
-    $slug = trim($_POST['slug'] ?? '');
-    $description = trim($_POST['description'] ?? '');
-    $technologies = trim($_POST['technologies'] ?? '');
-    $category = trim($_POST['category'] ?? 'fullstack');
+$slug = trim($_POST['slug'] ?? '');
+$description = trim($_POST['description'] ?? '');
+$technologies = trim($_POST['technologies'] ?? '');
+$category = trim($_POST['category'] ?? 'fullstack');
+$githubUrl = trim($_POST['github_url'] ?? '');
+$isFeatured = isset($_POST['is_featured']) ? 1 : 0;
 
     if ($message !== '') {
         // Keep the input error message.
@@ -96,7 +100,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!in_array($category, ['frontend', 'backend', 'fullstack'], true)) {
         $message = 'Please select a valid project category.';
         $messageType = 'danger';
+} elseif (strlen($githubUrl) > 500) {
+    $message = 'GitHub URL must not exceed 500 characters.';
+    $messageType = 'danger';
 
+} elseif (
+    $githubUrl !== '' &&
+    (
+        !filter_var($githubUrl, FILTER_VALIDATE_URL) ||
+        strtolower((string) parse_url($githubUrl, PHP_URL_SCHEME)) !== 'https' ||
+        strtolower((string) parse_url($githubUrl, PHP_URL_HOST)) !== 'github.com' ||
+        empty(parse_url($githubUrl, PHP_URL_PATH)) ||
+        parse_url($githubUrl, PHP_URL_QUERY) !== null ||
+        parse_url($githubUrl, PHP_URL_FRAGMENT) !== null
+    )
+) {
+    $message = 'Please enter a valid GitHub repository URL, such as https://github.com/username/repository.';
+    $messageType = 'danger';
     } else {
         $imagePath = '';
         $uploadedFilePath = '';
@@ -170,8 +190,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $messageType = 'danger';
         } else {
             $sql = "INSERT INTO projects
-                    (title, slug, description, technologies, category, image, is_featured)
-                    VALUES (?, ?, ?, ?, ?, ?, 1)";
+(title, slug, description, technologies, category, image, github_url, is_featured, created_by)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt = mysqli_prepare($conn, $sql);
 
@@ -180,16 +200,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = 'Could not add project. Please try again.';
                 $messageType = 'danger';
             } else {
-                mysqli_stmt_bind_param(
-                    $stmt,
-                    'ssssss',
-                    $title,
-                    $slug,
-                    $description,
-                    $technologies,
-                    $category,
-                    $imagePath
-                );
+                $createdBy = (int) $_SESSION['admin_id'];
+
+mysqli_stmt_bind_param(
+    $stmt,
+    'sssssssii',
+    $title,
+    $slug,
+    $description,
+    $technologies,
+    $category,
+    $imagePath,
+    $githubUrl,
+    $isFeatured,
+    $createdBy
+);
 
                 if (mysqli_stmt_execute($stmt)) {
                     mysqli_stmt_close($stmt);
@@ -229,7 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Add Project | Mujeeb Ahmed Badar</title>
+    <title>Add Project | MyPortfolio Admin Panel</title>
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -434,6 +459,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .project-actions { flex-direction: column; }
             .project-btn { width: 100%; }
         }
+
+        .project-form .form-check-input {
+    background-color: #0b1220;
+    border-color: #475569;
+}
+
+.project-form .form-check-input:checked {
+    background-color: #7c3aed;
+    border-color: #7c3aed;
+}
+
+.project-form .form-check-input:focus {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, .15);
+}
+
+.project-form .form-check-label {
+    color: #e2e8f0;
+    font-weight: 600;
+}
     </style>
 </head>
 
@@ -553,6 +598,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         Upload a JPG, PNG or WebP image. Maximum file size will be validated on the server.
     </small>
 </div>
+
+<div class="mb-4">
+    <label for="github_url" class="form-label">
+        GitHub Repository URL
+    </label>
+
+    <input
+        type="url"
+        id="github_url"
+        name="github_url"
+        class="form-control"
+        maxlength="500"
+        placeholder="https://github.com/username/repository"
+        value="<?= e($githubUrl) ?>"
+    >
+
+    <small class="field-help">
+        Optional. Enter the HTTPS URL of the project's GitHub repository.
+        Leave blank if the project is not uploaded to GitHub.
+    </small>
+</div>
+
+<div class="mb-4">
+    <div class="form-check">
+        <input
+            type="checkbox"
+            id="is_featured"
+            name="is_featured"
+            value="1"
+            class="form-check-input"
+            <?= $isFeatured === 1 ? 'checked' : '' ?>
+        >
+
+        <label for="is_featured" class="form-check-label">
+            Show this project in Featured Projects on the homepage
+        </label>
+    </div>
+
+    <small class="field-help">
+        Featured projects are selected for the homepage section.
+    </small>
+</div>
+
                 <div class="project-actions">
                     <button type="submit" class="project-btn project-btn-primary">
                         ＋ Save Project

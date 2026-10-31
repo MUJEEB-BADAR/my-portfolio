@@ -34,9 +34,8 @@ if ($statsResult) {
     error_log('Dashboard statistics query failed: ' . mysqli_error($conn));
 }
 
- // Get active admin account count for Super Admin.
+// Get admin account counts for Super Admin.
 $activeAdmins = 0;
-
 $inactiveAdmins = 0;
 $totalAdminAccounts = 0;
 
@@ -53,14 +52,11 @@ if (
     if ($activeAdminsResult) {
         $activeAdminsRow = mysqli_fetch_assoc($activeAdminsResult);
         $activeAdmins = (int) ($activeAdminsRow['total'] ?? 0);
-
         mysqli_free_result($activeAdminsResult);
     } else {
-        error_log(
-            'Dashboard active admins query failed: ' . mysqli_error($conn)
-        );
+        error_log('Dashboard active admins query failed: ' . mysqli_error($conn));
     }
-    
+
     $inactiveAdminsSql = "SELECT COUNT(*) AS total
                           FROM admin_users
                           WHERE is_active = 0";
@@ -70,14 +66,11 @@ if (
     if ($inactiveAdminsResult) {
         $inactiveAdminsRow = mysqli_fetch_assoc($inactiveAdminsResult);
         $inactiveAdmins = (int) ($inactiveAdminsRow['total'] ?? 0);
-
         mysqli_free_result($inactiveAdminsResult);
     } else {
-        error_log(
-            'Dashboard inactive admins query failed: ' . mysqli_error($conn)
-        );
+        error_log('Dashboard inactive admins query failed: ' . mysqli_error($conn));
     }
-    
+
     $totalAccountsSql = "SELECT COUNT(*) AS total FROM admin_users";
 
     $totalAccountsResult = mysqli_query($conn, $totalAccountsSql);
@@ -85,18 +78,13 @@ if (
     if ($totalAccountsResult) {
         $totalAccountsRow = mysqli_fetch_assoc($totalAccountsResult);
         $totalAdminAccounts = (int) ($totalAccountsRow['total'] ?? 0);
-
         mysqli_free_result($totalAccountsResult);
     } else {
-        error_log(
-            'Dashboard total admin accounts query failed: ' . mysqli_error($conn)
-        );
+        error_log('Dashboard total admin accounts query failed: ' . mysqli_error($conn));
     }
-
-
 }
 
-/* Get recent admin login activity for Super Admin. */
+// Get recent admin login activity for Super Admin.
 $recentAdminActivity = [];
 
 if (
@@ -121,10 +109,7 @@ if (
 
         mysqli_free_result($activityResult);
     } else {
-        error_log(
-            'Dashboard recent admin activity query failed: '
-            . mysqli_error($conn)
-        );
+        error_log('Dashboard recent admin activity query failed: ' . mysqli_error($conn));
     }
 }
 
@@ -159,7 +144,7 @@ function dashboardEscape($value): string
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Admin Dashboard | My Portfolio</title>
+    <title>Dashboard | MyPortfolio Admin Panel</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
@@ -195,12 +180,19 @@ function dashboardEscape($value): string
             padding-bottom: 55px;
         }
 
+        /* Welcome panel */
+
         .welcome-panel {
-            padding: 30px;
-            margin-bottom: 28px;
-            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            padding: 36px;
+            margin-bottom: 32px;
+            border: 1px solid rgba(139, 164, 255, .20);
             border-radius: 20px;
-            background: linear-gradient(120deg, #172747, #21183c);
+            background:
+                radial-gradient(circle at 90% 10%, rgba(168, 85, 247, .18), transparent 35%),
+                linear-gradient(120deg, #172747, #21183c);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, .18);
         }
 
         .eyebrow {
@@ -212,50 +204,77 @@ function dashboardEscape($value): string
         }
 
         .welcome-panel h1 {
-            margin: 12px 0;
-            font-size: clamp(1.8rem, 4vw, 2.7rem);
+            margin: 14px 0 12px;
+            font-size: clamp(1.9rem, 4vw, 2.8rem);
             font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -.8px;
+            color: #ffffff;
+            overflow-wrap: anywhere;
         }
 
         .welcome-panel p {
+            max-width: 650px;
             margin: 0;
-            color: var(--muted);
-            line-height: 1.7;
+            color: #c0cbe0;
+            font-size: .96rem;
+            line-height: 1.8;
         }
+
+        .welcome-panel .badge {
+            padding: 7px 12px;
+            font-size: .75rem;
+            font-weight: 650;
+        }
+
+        /* Section headings */
 
         .section-title {
             margin-bottom: 18px;
             font-size: 1.25rem;
             font-weight: 750;
+            letter-spacing: -.3px;
+            color: #f1f5ff;
         }
+
+        /* Statistics cards */
 
         .stat-card {
+            position: relative;
             height: 100%;
-            padding: 23px;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            background: rgba(19, 27, 49, .88);
-            transition: transform .2s, border-color .2s;
+            padding: 25px;
+            overflow: hidden;
+            border: 1px solid rgba(139, 164, 255, .14);
+            border-radius: 17px;
+            background: linear-gradient(
+                145deg,
+                rgba(25, 38, 67, .96),
+                rgba(19, 27, 49, .96)
+            );
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+            transition:
+                transform .25s ease,
+                border-color .25s ease,
+                box-shadow .25s ease;
         }
 
-
-.stat-link {
-    display: block;
-    height: 100%;
-    color: inherit;
-    text-decoration: none;
-}
-
-.stat-link:focus-visible {
-    outline: 2px solid #a78bfa;
-    outline-offset: 4px;
-    border-radius: 16px;
-}
-
-
         .stat-card:hover {
-            transform: translateY(-4px);
-            border-color: #5b8cff80;
+            transform: translateY(-5px);
+            border-color: rgba(91, 140, 255, .55);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, .22);
+        }
+
+        .stat-link {
+            display: block;
+            height: 100%;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .stat-link:focus-visible {
+            outline: 2px solid #a78bfa;
+            outline-offset: 4px;
+            border-radius: 16px;
         }
 
         .stat-label {
@@ -265,106 +284,134 @@ function dashboardEscape($value): string
 
         .stat-number {
             margin: 12px 0 5px;
+            color: #ffffff;
             font-size: 2.2rem;
             font-weight: 800;
+            line-height: 1.2;
         }
 
         .stat-icon {
             display: inline-flex;
-            width: 43px;
-            height: 43px;
+            width: 46px;
+            height: 46px;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
+            border: 1px solid rgba(91, 140, 255, .17);
+            border-radius: 13px;
             color: #dbe5ff;
-            background: #5b8cff20;
-            font-size: 1.25rem;
+            background: linear-gradient(135deg, #5b8cff25, #a855f725);
+            font-size: 1.3rem;
         }
+
+        /* Quick action cards */
 
         .quick-card {
             display: flex;
             height: 100%;
             flex-direction: column;
             align-items: flex-start;
-            padding: 23px;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            background: rgba(19, 27, 49, .88);
+            padding: 25px;
+            border: 1px solid rgba(139, 164, 255, .14);
+            border-radius: 17px;
+            background: linear-gradient(
+                145deg,
+                rgba(25, 38, 67, .96),
+                rgba(19, 27, 49, .96)
+            );
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+            transition:
+                transform .25s ease,
+                border-color .25s ease,
+                box-shadow .25s ease;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(168, 85, 247, .45);
+            box-shadow: 0 13px 28px rgba(0, 0, 0, .20);
         }
 
         .quick-card h3 {
-            margin: 16px 0 8px;
-            font-size: 1.05rem;
-            font-weight: 700;
+            margin: 17px 0 9px;
+            color: #f1f5ff;
+            font-size: 1.08rem;
+            font-weight: 750;
         }
 
         .quick-card p {
             flex: 1;
+            margin-bottom: 20px;
             color: var(--muted);
             font-size: .9rem;
-            line-height: 1.7;
+            line-height: 1.75;
         }
+
+        /* Buttons */
 
         .btn-gradient {
             display: inline-block;
-            color: white;
+            color: #ffffff;
             text-decoration: none;
-            border: none;
+            border: 1px solid transparent;
             border-radius: 9px;
-            padding: 10px 15px;
+            padding: 10px 16px;
             font-size: .9rem;
             font-weight: 650;
             background: linear-gradient(110deg, var(--blue), var(--purple));
+            transition: filter .2s ease, transform .2s ease;
         }
 
         .btn-gradient:hover {
-            color: white;
-            filter: brightness(1.1);
+            color: #ffffff;
+            filter: brightness(1.12);
+            transform: translateY(-1px);
         }
 
         .btn-outline-custom {
             display: inline-block;
             color: #dbe5ff;
             text-decoration: none;
-            border: 1px solid var(--border);
+            border: 1px solid rgba(139, 164, 255, .22);
             border-radius: 9px;
             padding: 9px 14px;
-            font-size: .9rem;
+            font-size: .88rem;
+            font-weight: 600;
+            transition: background .2s ease, border-color .2s ease;
         }
 
         .btn-outline-custom:hover {
-            color: white;
-            background: #ffffff0d;
+            color: #ffffff;
+            border-color: rgba(91, 140, 255, .55);
+            background: rgba(91, 140, 255, .12);
         }
 
-        
-.recent-panel {
-    overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: rgba(19, 27, 49, .88);
-}
+        .btn-gradient:focus-visible,
+        .btn-outline-custom:focus-visible {
+            outline: 2px solid #a78bfa;
+            outline-offset: 3px;
+        }
 
-/* Space between Recent Projects and Admin Activity */
-.recent-panel + section {
-    margin-top: 42px;
-}
+        /* Recent projects and activity panels */
 
-.activity-table-wrapper {
-    margin-top: 0;
-}
-
-.activity-footer {
-    margin-top: 20px;
-}
-
+        .recent-panel {
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            background: rgba(19, 27, 49, .92);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+        }
 
         .recent-row {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px 20px;
+            gap: 16px;
+            padding: 17px 21px;
             border-bottom: 1px solid var(--border);
+            transition: background .2s ease;
+        }
+
+        .recent-row:hover {
+            background: rgba(91, 140, 255, .055);
         }
 
         .recent-row:last-child {
@@ -372,11 +419,12 @@ function dashboardEscape($value): string
         }
 
         .recent-image {
-            width: 76px;
-            height: 58px;
+            width: 78px;
+            height: 60px;
             flex-shrink: 0;
             overflow: hidden;
-            border-radius: 9px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 10px;
             background: #202b47;
         }
 
@@ -405,233 +453,263 @@ function dashboardEscape($value): string
         .recent-info h3 {
             margin: 0 0 6px;
             overflow-wrap: anywhere;
+            color: #f1f5ff;
             font-size: .98rem;
             font-weight: 700;
         }
 
         .recent-info p {
-            margin: 0;
+            margin: 0 0 4px;
             color: var(--muted);
             font-size: .82rem;
             text-transform: capitalize;
         }
 
-        .empty-message {
-            padding: 30px 20px;
-            color: var(--muted);
-            text-align: center;
+        .recent-info p:last-child {
+            margin-bottom: 0;
         }
 
+        .recent-row > .d-flex {
+            flex-shrink: 0;
+        }
+
+        .empty-message {
+            padding: 35px 20px;
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.7;
+        }
+
+        /* Recent admin activity */
+
+        .activity-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #2b3852;
+            border-radius: 14px;
+            background: #111c31;
+            scrollbar-width: thin;
+            scrollbar-color: #526487 #111c31;
+        }
+
+        .activity-table {
+            width: 100%;
+            min-width: 780px;
+            margin: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        .activity-table thead th {
+            padding: 18px 26px;
+            background: #0b1224;
+            color: #a9c3ff;
+            border-bottom: 1px solid #2b3852;
+            font-size: .76rem;
+            font-weight: 700;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .activity-table tbody td {
+            padding: 20px 26px;
+            background: #111c31;
+            color: #e2e8f0;
+            border-bottom: 1px solid #263449;
+            font-size: .9rem;
+            white-space: nowrap;
+            transition: background .2s ease;
+        }
+
+        .activity-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .activity-table tbody tr:hover td {
+            background: #192740;
+        }
+
+        .activity-username {
+            display: inline-block;
+            min-width: 110px;
+            color: #d2c2ff;
+            font-weight: 700;
+        }
+
+        .activity-ip {
+            display: inline-block;
+            min-width: 125px;
+            color: #a6b1ca;
+            font-family: Consolas, monospace;
+            font-size: .84rem;
+        }
+
+        .activity-status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 105px;
+            padding: 8px 13px;
+            border: 1px solid transparent;
+            border-radius: 20px;
+            font-size: .76rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .activity-status-active {
+            color: #86efac;
+            background: #143a2b;
+            border-color: #276749;
+        }
+
+        .activity-status-logged_out {
+            color: #cbd5e1;
+            background: #29364b;
+            border-color: #475569;
+        }
+
+        .activity-status-expired {
+            color: #fde68a;
+            background: #493719;
+            border-color: #806323;
+        }
+
+        .activity-status-disabled {
+            color: #fca5a5;
+            background: #4b2028;
+            border-color: #7f303d;
+        }
+
+        .activity-status-unknown {
+            color: #cbd5e1;
+            background: #29364b;
+            border-color: #475569;
+        }
+
+        .activity-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+            padding: 0 2px;
+        }
+
+        .activity-footer .stat-label {
+            line-height: 1.7;
+        }
+
+        /* Dashboard footer */
+
         .dashboard-footer {
-            padding-top: 20px;
-            margin-top: 35px;
+            padding-top: 22px;
+            margin-top: 40px;
             border-top: 1px solid var(--border);
             color: #8490aa;
             text-align: center;
             font-size: .85rem;
         }
 
-        
-/* Responsive dashboard styles */
-@media (max-width: 576px) {
-    .dashboard {
-        padding-top: 25px;
-        padding-bottom: 35px;
-    }
+        /* Responsive styles */
 
-    .welcome-panel {
-        padding: 23px;
-    }
+        @media (max-width: 768px) {
+            .dashboard {
+                padding-top: 30px;
+            }
 
-    .stat-card,
-    .quick-card {
-        padding: 19px;
-    }
+            .welcome-panel {
+                padding: 28px;
+            }
 
-    .recent-row {
-        gap: 11px;
-        padding: 15px;
-    }
+            .recent-row {
+                gap: 12px;
+            }
+        }
 
-    .recent-image {
-        width: 64px;
-        height: 54px;
-    }
-}
+        @media (max-width: 576px) {
+            .dashboard {
+                padding-top: 25px;
+                padding-bottom: 35px;
+            }
 
-/* Recent project actions */
-.recent-row > .d-flex {
-    flex-shrink: 0;
-}
+            .welcome-panel {
+                padding: 23px;
+                border-radius: 16px;
+            }
 
-@media (max-width: 480px) {
-    .recent-row {
-        flex-wrap: wrap;
-    }
+            .stat-card,
+            .quick-card {
+                padding: 20px;
+            }
 
-    .recent-info {
-        flex: 1 1 calc(100% - 80px);
-    }
+            .stat-number {
+                font-size: 2rem;
+            }
 
-    .recent-row > .d-flex {
-        display: flex;
-        width: 100%;
-        padding-left: 75px;
-    }
+            .recent-row {
+                gap: 11px;
+                padding: 15px;
+            }
 
-    .recent-row > .d-flex a {
-        flex: 1;
-        text-align: center;
-    }
-}
+            .recent-image {
+                width: 64px;
+                height: 54px;
+            }
 
-/* Recent Admin Activity */
-.activity-table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    border: 1px solid #2b3852;
-    border-radius: 14px;
-    background: #111c31;
-    scrollbar-width: thin;
-    scrollbar-color: #526487 #111c31;
-}
+            .activity-table thead th {
+                padding: 17px 22px;
+            }
 
-.activity-table {
-    width: 100%;
-    min-width: 780px;
-    margin: 0;
-    border-collapse: separate;
-    border-spacing: 0;
-    color: var(--text);
-    vertical-align: middle;
-}
+            .activity-table tbody td {
+                padding: 20px 22px;
+            }
 
-.activity-table thead th {
-    padding: 18px 26px;
-    background: #0b1224;
-    color: #a9c3ff;
-    border-bottom: 1px solid #2b3852;
-    font-size: .76rem;
-    font-weight: 700;
-    letter-spacing: .7px;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
+            .activity-footer {
+                align-items: stretch;
+                gap: 12px;
+                margin-top: 16px;
+            }
 
-.activity-table tbody td {
-    padding: 21px 26px;
-    background: #111c31;
-    color: #e2e8f0;
-    border-bottom: 1px solid #263449;
-    font-size: .9rem;
-    white-space: nowrap;
-    transition: background .2s ease;
-}
+            .activity-footer a {
+                text-align: center;
+            }
+        }
 
-.activity-table tbody tr:last-child td {
-    border-bottom: none;
-}
+        @media (max-width: 480px) {
+            .recent-row {
+                flex-wrap: wrap;
+            }
 
-.activity-table tbody tr:hover td {
-    background: #192740;
-}
+            .recent-info {
+                flex: 1 1 calc(100% - 80px);
+            }
 
-.activity-username {
-    display: inline-block;
-    min-width: 110px;
-    color: #d2c2ff;
-    font-weight: 700;
-}
+            .recent-row > .d-flex {
+                display: flex;
+                width: 100%;
+                padding-left: 75px;
+            }
 
-.activity-ip {
-    display: inline-block;
-    min-width: 125px;
-    color: #a6b1ca;
-    font-family: Consolas, monospace;
-    font-size: .84rem;
-}
+            .recent-row > .d-flex a {
+                flex: 1;
+                text-align: center;
+            }
+        }
 
-.activity-status {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 105px;
-    padding: 8px 13px;
-    border: 1px solid transparent;
-    border-radius: 20px;
-    font-size: .76rem;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.activity-status-active {
-    color: #86efac;
-    background: #143a2b;
-    border-color: #276749;
-}
-
-.activity-status-logged_out {
-    color: #cbd5e1;
-    background: #29364b;
-    border-color: #475569;
-}
-
-.activity-status-expired {
-    color: #fde68a;
-    background: #493719;
-    border-color: #806323;
-}
-
-.activity-status-disabled {
-    color: #fca5a5;
-    background: #4b2028;
-    border-color: #7f303d;
-}
-
-.activity-status-unknown {
-    color: #cbd5e1;
-    background: #29364b;
-    border-color: #475569;
-}
-
-/* Activity section footer */
-.activity-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 20px;
-    padding: 0 2px;
-}
-
-.activity-footer .stat-label {
-    line-height: 1.7;
-}
-
-/* Small screens */
-@media (max-width: 576px) {
-    .activity-table thead th {
-        padding: 17px 22px;
-    }
-
-    .activity-table tbody td {
-        padding: 20px 22px;
-    }
-
-    .activity-footer {
-        align-items: stretch;
-        gap: 12px;
-        margin-top: 16px;
-    }
-
-    .activity-footer a {
-        text-align: center;
-    }
-}
-
-
-        
+        @media (prefers-reduced-motion: reduce) {
+            .stat-card,
+            .quick-card,
+            .recent-row,
+            .btn-gradient,
+            .btn-outline-custom {
+                transition: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -640,150 +718,151 @@ function dashboardEscape($value): string
 
 <main class="container dashboard">
 
-    
-<section class="welcome-panel">
-    <span class="eyebrow">Control Center</span>
+    <!-- Welcome panel -->
+    <section class="welcome-panel">
+        <span class="eyebrow">Control Center</span>
 
-    <h1>
-        Welcome,
-        <?= dashboardEscape($_SESSION['admin_username'] ?? 'Admin') ?>!
-    </h1>
+        <h1>
+            Welcome,
+            <?= dashboardEscape($_SESSION['admin_username'] ?? 'Admin') ?>!
+        </h1>
 
-    <p>
-        Manage your portfolio projects, review your work and keep
-        your website content organized from one place.
-    </p>
+        <p>
+            Manage your portfolio projects, review your work and keep
+            your website content organized from one place.
+        </p>
 
-    <div class="mt-3">
-        <span class="stat-label">Account role:</span>
+        <div class="mt-3">
+            <span class="stat-label">Account role:</span>
 
-        <span class="badge rounded-pill text-bg-primary ms-1">
-            <?= dashboardEscape(
-                ucwords(str_replace(
-                    '_',
-                    ' ',
-                    $_SESSION['admin_role'] ?? 'admin'
-                ))
-            ) ?>
-        </span>
-    </div>
-</section>
+            <span class="badge rounded-pill text-bg-primary ms-1">
+                <?= dashboardEscape(
+                    ucwords(str_replace(
+                        '_',
+                        ' ',
+                        $_SESSION['admin_role'] ?? 'admin'
+                    ))
+                ) ?>
+            </span>
+        </div>
+    </section>
 
-
+    <!-- Project overview -->
     <section class="mb-5">
         <h2 class="section-title">Project Overview</h2>
 
         <div class="row g-3">
-            
-<div class="col-12 col-sm-6 col-xl-3">
-    <a href="view-projects.php"
-       class="stat-link"
-       aria-label="View all projects">
-        <div class="stat-card">
-            <span class="stat-icon" aria-hidden="true">&#128196;</span>
-            <div class="stat-label mt-3">Total Projects</div>
-            <div class="stat-number"><?= $stats['total'] ?></div>
-            <div class="stat-label">All saved projects</div>
-        </div>
-    </a>
-</div>
 
-
-            
-<div class="col-12 col-sm-6 col-xl-3">
-    <a href="view-projects.php?category=frontend"
-       class="stat-link"
-       aria-label="View frontend projects">
-        <div class="stat-card">
-            <span class="stat-icon" aria-hidden="true">&#127912;</span>
-            <div class="stat-label mt-3">Frontend</div>
-            <div class="stat-number"><?= $stats['frontend'] ?></div>
-            <div class="stat-label">Frontend projects</div>
-        </div>
-    </a>
-</div>
-
-
-            
-<div class="col-12 col-sm-6 col-xl-3">
-    <a href="view-projects.php?category=backend"
-       class="stat-link"
-       aria-label="View backend projects">
-        <div class="stat-card">
-            <span class="stat-icon" aria-hidden="true">&#9881;</span>
-            <div class="stat-label mt-3">Backend</div>
-            <div class="stat-number"><?= $stats['backend'] ?></div>
-            <div class="stat-label">Backend projects</div>
-        </div>
-    </a>
-</div>
-
-
-            
-<div class="col-12 col-sm-6 col-xl-3">
-    <a href="view-projects.php?category=fullstack"
-       class="stat-link"
-       aria-label="View full stack projects">
-        <div class="stat-card">
-            <span class="stat-icon" aria-hidden="true">&#128187;</span>
-            <div class="stat-label mt-3">Full Stack</div>
-            <div class="stat-number"><?= $stats['fullstack'] ?></div>
-            <div class="stat-label">Full stack projects</div>
-        </div>
-    </a>
-</div>
-
-        </div>
-        
-    </section>
-<?php if (
-    isset($_SESSION['admin_role']) &&
-    $_SESSION['admin_role'] === 'super_admin'
-): ?>
-    <section class="mb-5">
-        <h2 class="section-title">Account Overview</h2>
-
-        <div class="row g-3">
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="stat-card">
-                    <span class="stat-icon" aria-hidden="true">&#128101;</span>
-                    <div class="stat-label mt-3">Active Admins</div>
-                    <div class="stat-number"><?= $activeAdmins ?></div>
-                    <div class="stat-label">Active admin accounts</div>
-                </div>
-            </div>
-            
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="stat-card">
-                    <span class="stat-icon" aria-hidden="true">&#128683;</span>
-                    <div class="stat-label mt-3">Inactive Admins</div>
-                    <div class="stat-number"><?= $inactiveAdmins ?></div>
-                    <div class="stat-label">Disabled admin accounts</div>
-                </div>
-            </div>
-            
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="stat-card">
-                    <span class="stat-icon" aria-hidden="true">&#128100;</span>
-                    <div class="stat-label mt-3">Total Accounts</div>
-                    <div class="stat-number"><?= $totalAdminAccounts ?></div>
-                    <div class="stat-label">All admin accounts</div>
-                </div>
+                <a href="view-projects.php"
+                   class="stat-link"
+                   aria-label="View all projects">
+                    <div class="stat-card">
+                        <span class="stat-icon" aria-hidden="true">&#128196;</span>
+                        <div class="stat-label mt-3">Total Projects</div>
+                        <div class="stat-number"><?= $stats['total'] ?></div>
+                        <div class="stat-label">All saved projects</div>
+                    </div>
+                </a>
             </div>
 
+            <div class="col-12 col-sm-6 col-xl-3">
+                <a href="view-projects.php?category=frontend"
+                   class="stat-link"
+                   aria-label="View frontend projects">
+                    <div class="stat-card">
+                        <span class="stat-icon" aria-hidden="true">&#127912;</span>
+                        <div class="stat-label mt-3">Frontend</div>
+                        <div class="stat-number"><?= $stats['frontend'] ?></div>
+                        <div class="stat-label">Frontend projects</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <a href="view-projects.php?category=backend"
+                   class="stat-link"
+                   aria-label="View backend projects">
+                    <div class="stat-card">
+                        <span class="stat-icon" aria-hidden="true">&#9881;</span>
+                        <div class="stat-label mt-3">Backend</div>
+                        <div class="stat-number"><?= $stats['backend'] ?></div>
+                        <div class="stat-label">Backend projects</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <a href="view-projects.php?category=fullstack"
+                   class="stat-link"
+                   aria-label="View full stack projects">
+                    <div class="stat-card">
+                        <span class="stat-icon" aria-hidden="true">&#128187;</span>
+                        <div class="stat-label mt-3">Full Stack</div>
+                        <div class="stat-number"><?= $stats['fullstack'] ?></div>
+                        <div class="stat-label">Full stack projects</div>
+                    </div>
+                </a>
+            </div>
 
         </div>
     </section>
-<?php endif; ?>
+
+    <!-- Account overview: Super Admin only -->
+    <?php if (
+        isset($_SESSION['admin_role']) &&
+        $_SESSION['admin_role'] === 'super_admin'
+    ): ?>
+        <section class="mb-5">
+            <h2 class="section-title">Account Overview</h2>
+
+            <div class="row g-3">
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <span class="stat-icon" aria-hidden="true">&#128101;</span>
+                        <div class="stat-label mt-3">Active Admins</div>
+                        <div class="stat-number"><?= $activeAdmins ?></div>
+                        <div class="stat-label">Active admin accounts</div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <span class="stat-icon" aria-hidden="true">&#128683;</span>
+                        <div class="stat-label mt-3">Inactive Admins</div>
+                        <div class="stat-number"><?= $inactiveAdmins ?></div>
+                        <div class="stat-label">Disabled admin accounts</div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <span class="stat-icon" aria-hidden="true">&#128100;</span>
+                        <div class="stat-label mt-3">Total Accounts</div>
+                        <div class="stat-number"><?= $totalAdminAccounts ?></div>
+                        <div class="stat-label">All admin accounts</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <!-- Quick actions -->
     <section class="mb-5">
         <h2 class="section-title">Quick Actions</h2>
 
         <div class="row g-3">
+
             <div class="col-12 col-md-4">
                 <div class="quick-card">
                     <span class="stat-icon" aria-hidden="true">&#43;</span>
                     <h3>Add a Project</h3>
-                    <p>Add a new project with its description, technologies, category and image.</p>
+                    <p>
+                        Add a new project with its description, technologies,
+                        category and image.
+                    </p>
                     <a href="add-project.php" class="btn-gradient">Add Project</a>
                 </div>
             </div>
@@ -792,7 +871,9 @@ function dashboardEscape($value): string
                 <div class="quick-card">
                     <span class="stat-icon" aria-hidden="true">&#128065;</span>
                     <h3>Manage Projects</h3>
-                    <p>Search, filter, edit and delete existing portfolio projects.</p>
+                    <p>
+    Search, filter and manage existing portfolio projects.
+</p>
                     <a href="view-projects.php" class="btn-gradient">View Projects</a>
                 </div>
             </div>
@@ -801,37 +882,47 @@ function dashboardEscape($value): string
                 <div class="quick-card">
                     <span class="stat-icon" aria-hidden="true">&#127760;</span>
                     <h3>Public Portfolio</h3>
-                    <p>Open your public website to see how visitors experience your portfolio.</p>
-                    <a href="index.php" class="btn-gradient">
-    View Website
-</a>
+                    <p>
+                        Open your public website to see how visitors experience
+                        your portfolio.
+                    </p>
+                    <a href="index.php" class="btn-gradient">View Website</a>
                 </div>
             </div>
-            
-<?php if (
-    isset($_SESSION['admin_role']) &&
-    $_SESSION['admin_role'] === 'super_admin'
-): ?>
-    <div class="col-12 col-md-4">
-        <div class="quick-card">
-            <span class="stat-icon" aria-hidden="true">&#128101;</span>
-            <h3>Manage Admins</h3>
-            <p>Create admin accounts, review existing accounts and manage their access.</p>
-            <a href="manage-admins.php" class="btn-gradient">Manage Admins</a>
-        </div>
-    </div>
-<?php endif; ?>
+
+            <?php if (
+                isset($_SESSION['admin_role']) &&
+                $_SESSION['admin_role'] === 'super_admin'
+            ): ?>
+                <div class="col-12 col-md-4">
+                    <div class="quick-card">
+                        <span class="stat-icon" aria-hidden="true">&#128101;</span>
+                        <h3>Manage Admins</h3>
+                        <p>
+                            Create admin accounts, review existing accounts
+                            and manage their access.
+                        </p>
+                        <a href="manage-admins.php" class="btn-gradient">
+                            Manage Admins
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
 
         </div>
     </section>
 
+    <!-- Recent projects -->
     <section>
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
             <h2 class="section-title mb-0">Recent Projects</h2>
-            <a href="view-projects.php" class="btn-outline-custom">View All Projects</a>
+            <a href="view-projects.php" class="btn-outline-custom">
+                View All Projects
+            </a>
         </div>
 
         <div class="recent-panel">
+
             <?php if (!empty($recentProjects)): ?>
 
                 <?php foreach ($recentProjects as $project): ?>
@@ -849,6 +940,7 @@ function dashboardEscape($value): string
                     ?>
 
                     <div class="recent-row">
+
                         <div class="recent-image">
                             <?php if ($validRecentImage): ?>
                                 <img
@@ -857,65 +949,90 @@ function dashboardEscape($value): string
                                     loading="lazy"
                                 >
                             <?php else: ?>
-                                <div class="recent-placeholder" aria-hidden="true">&#128196;</div>
+                                <div class="recent-placeholder" aria-hidden="true">
+                                    &#128196;
+                                </div>
                             <?php endif; ?>
                         </div>
 
-                        
-<div class="recent-info">
-    <h3><?= dashboardEscape($project['title'] ?? 'Untitled Project') ?></h3>
-    <p>
-        <?= dashboardEscape(ucwords(str_replace('_', ' ', $project['category'] ?? 'Uncategorized'))) ?>
-    </p>
-    <p>
-        Added:
-        <?php
-        $createdAt = $project['created_at'] ?? '';
-        $timestamp = is_string($createdAt) ? strtotime($createdAt) : false;
-        echo $timestamp !== false ? date('d M Y', $timestamp) : 'Date unavailable';
-        ?>
-    </p>
-</div>
+                        <div class="recent-info">
+                            <h3>
+                                <?= dashboardEscape($project['title'] ?? 'Untitled Project') ?>
+                            </h3>
 
+                            <p>
+                                <?= dashboardEscape(
+                                    ucwords(str_replace(
+                                        '_',
+                                        ' ',
+                                        $project['category'] ?? 'Uncategorized'
+                                    ))
+                                ) ?>
+                            </p>
 
-                        
-<div class="d-flex flex-wrap gap-2">
-    <a
-    href="project-details.php?slug=<?= dashboardEscape(rawurlencode((string) ($project['slug'] ?? ''))) ?>"
-    class="btn-outline-custom"
->View Project</a>
+                            <p>
+                                Added:
+                                <?php
+                                $createdAt = $project['created_at'] ?? '';
+                                $timestamp = is_string($createdAt)
+                                    ? strtotime($createdAt)
+                                    : false;
 
-    <a
-        href="update-project.php?id=<?= (int) $project['id'] ?>"
-        class="btn-outline-custom"
-    >Edit</a>
-</div>
+                                echo $timestamp !== false
+                                    ? date('d M Y', $timestamp)
+                                    : 'Date unavailable';
+                                ?>
+                            </p>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <a
+                                href="project-details.php?slug=<?= dashboardEscape(rawurlencode((string) ($project['slug'] ?? ''))) ?>"
+                                class="btn-outline-custom"
+                            >View Project</a>
+
+                            <a
+                                href="update-project.php?id=<?= (int) $project['id'] ?>"
+                                class="btn-outline-custom"
+                            >Edit</a>
+                        </div>
 
                     </div>
                 <?php endforeach; ?>
 
             <?php else: ?>
+
                 <div class="empty-message">
                     No projects have been added yet.
+
                     <div class="mt-3">
-                        <a href="add-project.php" class="btn-gradient">Add Your First Project</a>
+                        <a href="add-project.php" class="btn-gradient">
+                            Add Your First Project
+                        </a>
                     </div>
                 </div>
+
             <?php endif; ?>
+
         </div>
     </section>
 
+    <!-- Recent admin activity: Super Admin only -->
     <?php if (
         isset($_SESSION['admin_role']) &&
         $_SESSION['admin_role'] === 'super_admin'
     ): ?>
         <section class="mb-5" style="margin-top: 50px !important;">
+
             <h2 class="section-title">Recent Admin Activity</h2>
 
             <div class="recent-panel">
+
                 <?php if (!empty($recentAdminActivity)): ?>
+
                     <div class="activity-table-wrapper">
                         <table class="activity-table">
+
                             <thead>
                                 <tr>
                                     <th>Username</th>
@@ -924,81 +1041,86 @@ function dashboardEscape($value): string
                                     <th>Status</th>
                                 </tr>
                             </thead>
+
                             <tbody>
+
                                 <?php foreach ($recentAdminActivity as $activity): ?>
+
                                     <?php
                                     $activityStatus = (string) ($activity['status'] ?? '');
+
                                     $validActivityStatuses = [
                                         'active',
                                         'logged_out',
                                         'expired',
                                         'disabled'
                                     ];
+
+                                    $statusClass = in_array(
+                                        $activityStatus,
+                                        $validActivityStatuses,
+                                        true
+                                    ) ? $activityStatus : 'unknown';
                                     ?>
+
                                     <tr>
+
                                         <td>
-    <span class="activity-username">
-        <?= dashboardEscape($activity['username'] ?? 'Unknown') ?>
-    </span>
-</td>
-                                        <td>
-                                            <?= dashboardEscape(
-                                                $activity['login_at'] ?? 'N/A'
-                                            ) ?>
+                                            <span class="activity-username">
+                                                <?= dashboardEscape($activity['username'] ?? 'Unknown') ?>
+                                            </span>
                                         </td>
+
                                         <td>
-    <span class="activity-ip">
-        <?= dashboardEscape($activity['ip_address'] ?? 'N/A') ?>
-    </span>
-</td>
-                                        
-<td>
-    <?php
-    $validActivityStatuses = [
-        'active',
-        'logged_out',
-        'expired',
-        'disabled'
-    ];
+                                            <?= dashboardEscape($activity['login_at'] ?? 'N/A') ?>
+                                        </td>
 
-    $activityStatus = (string) ($activity['status'] ?? '');
-    $statusClass = in_array(
-        $activityStatus,
-        $validActivityStatuses,
-        true
-    ) ? $activityStatus : 'unknown';
-    ?>
+                                        <td>
+                                            <span class="activity-ip">
+                                                <?= dashboardEscape($activity['ip_address'] ?? 'N/A') ?>
+                                            </span>
+                                        </td>
 
-    <span class="activity-status activity-status-<?= dashboardEscape($statusClass) ?>">
-        <?= dashboardEscape(
-            $statusClass === 'unknown'
-                ? 'Unknown'
-                : ucwords(str_replace('_', ' ', $activityStatus))
-        ) ?>
-    </span>
-</td>
+                                        <td>
+                                            <span class="activity-status activity-status-<?= dashboardEscape($statusClass) ?>">
+                                                <?= dashboardEscape(
+                                                    $statusClass === 'unknown'
+                                                        ? 'Unknown'
+                                                        : ucwords(str_replace('_', ' ', $activityStatus))
+                                                ) ?>
+                                            </span>
+                                        </td>
 
                                     </tr>
+
                                 <?php endforeach; ?>
+
                             </tbody>
                         </table>
                     </div>
+
                 <?php else: ?>
+
                     <div class="empty-message">
                         No admin login activity found.
                     </div>
+
                 <?php endif; ?>
+
             </div>
 
             <div class="activity-footer">
-    <span class="stat-label">
-        Showing the 5 most recent login records
-    </span>
 
-    <a href="login-history.php" class="btn-outline-custom">
-        View Full Login History
-    </a>
-</div>
+                <span class="stat-label">
+                    Showing the 5 most recent login records
+                </span>
+
+                <a href="login-history.php" class="btn-outline-custom">
+                    View Full Login History
+                </a>
+
+            </div>
+
         </section>
     <?php endif; ?>
 
@@ -1009,5 +1131,6 @@ function dashboardEscape($value): string
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

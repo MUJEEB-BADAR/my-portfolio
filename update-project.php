@@ -16,7 +16,7 @@ function validProjectImagePath($path): bool
 {
     return is_string($path)
         && preg_match(
-            '#\Auploads/[a-f0-9]{32}\.(?:jpg|png|webp)\z#i',
+            '#\Auploads/[a-f0-9]{32}\.(?:jpg|jpeg|png|webp)\z#i',
             $path
         ) === 1
         && is_file(__DIR__ . '/' . $path);
@@ -31,6 +31,8 @@ $description = '';
 $technologies = '';
 $category = 'frontend';
 $currentImage = '';
+$githubUrl = '';
+$isFeatured = 0;
 $allowedCategories = ['frontend', 'backend', 'fullstack'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -46,9 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     foreach (
-        ['id', 'title', 'slug', 'description', 'technologies', 'category']
-        as $field
-    ) {
+    ['id', 'title', 'slug', 'description', 'technologies', 'category', 'github_url']
+    as $field
+)  {
         if (isset($_POST[$field]) && !is_string($_POST[$field])) {
             http_response_code(400);
             exit('Invalid form input.');
@@ -63,6 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = trim($_POST['description'] ?? '');
     $technologies = trim($_POST['technologies'] ?? '');
     $category = trim($_POST['category'] ?? '');
+    $githubUrl = trim($_POST['github_url'] ?? '');
+$isFeatured = isset($_POST['is_featured']) ? 1 : 0;
 
     if ($id === false || $id === null || $id < 1) {
         $message = 'Please select a valid project.';
@@ -90,9 +94,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = 'Technologies cannot exceed 1000 characters.';
         $messageType = 'error';
     } elseif (!in_array($category, $allowedCategories, true)) {
-        $message = 'Please select a valid project category.';
-        $messageType = 'error';
-    } else {
+    $message = 'Please select a valid project category.';
+    $messageType = 'error';
+} elseif (strlen($description) > 20000) {
+    $message = 'Description cannot exceed 20000 characters.';
+    $messageType = 'error';
+} elseif (strlen($githubUrl) > 500) {
+    $message = 'GitHub URL cannot exceed 500 characters.';
+    $messageType = 'error';
+} elseif ($githubUrl !== '' && (
+    !filter_var($githubUrl, FILTER_VALIDATE_URL) ||
+    strtolower((string) parse_url($githubUrl, PHP_URL_SCHEME)) !== 'https' ||
+    strtolower((string) parse_url($githubUrl, PHP_URL_HOST)) !== 'github.com' ||
+    empty(parse_url($githubUrl, PHP_URL_PATH)) ||
+    parse_url($githubUrl, PHP_URL_QUERY) !== null ||
+    parse_url($githubUrl, PHP_URL_FRAGMENT) !== null
+)) {
+    $message = 'Please enter a valid GitHub repository URL.';
+    $messageType = 'error';
+} else {
         // Load the current image before making any changes.
         $check = mysqli_prepare(
             $conn,
@@ -175,7 +195,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $messageType = 'error';
                     } else {
                         $uploadDirectory = __DIR__ . '/uploads';
-
                         if (
                             !is_dir($uploadDirectory) ||
                             !is_writable($uploadDirectory)
@@ -206,9 +225,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     : $currentImage;
 
                 $sql = 'UPDATE projects
-                        SET title = ?, slug = ?, description = ?,
-                            technologies = ?, category = ?, image = ?
-                        WHERE id = ?';
+        SET title = ?, slug = ?, description = ?,
+            technologies = ?, category = ?, image = ?,
+            github_url = ?, is_featured = ?, updated_by = ?
+        WHERE id = ?';
 
                 $stmt = mysqli_prepare($conn, $sql);
 
@@ -217,17 +237,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $message = 'Could not prepare the update. Please try again.';
                     $messageType = 'error';
                 } else {
-                    mysqli_stmt_bind_param(
-                        $stmt,
-                        'ssssssi',
-                        $title,
-                        $slug,
-                        $description,
-                        $technologies,
-                        $category,
-                        $imageToSave,
-                        $id
-                    );
+                    $updatedBy = (int) $_SESSION['admin_id'];
+
+mysqli_stmt_bind_param(
+    $stmt,
+    'sssssssiii',
+    $title,
+    $slug,
+    $description,
+    $technologies,
+    $category,
+    $imageToSave,
+    $githubUrl,
+    $isFeatured,
+    $updatedBy,
+    $id
+);
 
                     if (mysqli_stmt_execute($stmt)) {
                         mysqli_stmt_close($stmt);
@@ -284,8 +309,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = mysqli_prepare(
             $conn,
-            'SELECT title, slug, description, technologies, category, image
-             FROM projects WHERE id = ? LIMIT 1'
+            'SELECT title, slug, description, technologies, category, image,
+        github_url, is_featured
+ FROM projects WHERE id = ? LIMIT 1'
         );
 
         if (!$stmt) {
@@ -303,16 +329,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $id = 0;
             } else {
                 mysqli_stmt_bind_result(
-                    $stmt,
-                    $dbTitle,
-                    $dbSlug,
-                    $dbDescription,
-                    $dbTechnologies,
-                    $dbCategory,
-                    $dbImage
-                );
-
-                if (mysqli_stmt_fetch($stmt)) {
+    $stmt,
+    $dbTitle,
+    $dbSlug,
+    $dbDescription,
+    $dbTechnologies,
+    $dbCategory,
+    $dbImage,
+    $dbGithubUrl,
+    $dbIsFeatured
+);
+if (mysqli_stmt_fetch($stmt)) {
                     $title = $dbTitle;
                     $slug = $dbSlug;
                     $description = $dbDescription;
@@ -321,6 +348,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $currentImage = validProjectImagePath($dbImage)
                         ? $dbImage
                         : '';
+                        $githubUrl = $dbGithubUrl ?? '';
+$isFeatured = (int) $dbIsFeatured;
 
                     if (!in_array($category, $allowedCategories, true)) {
                         $category = 'frontend';
@@ -351,7 +380,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Project | My Portfolio</title>
+    <title>Update Project | MyPortfolio Admin Panel</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
@@ -648,6 +677,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="fullstack" <?= $category === 'fullstack' ? 'selected' : '' ?>>Full Stack</option>
                 </select>
             </div>
+            <div class="mb-4">
+    <label for="github_url" class="form-label">
+        GitHub Repository URL
+    </label>
+
+    <input
+        type="url"
+        id="github_url"
+        name="github_url"
+        class="form-control"
+        maxlength="500"
+        value="<?= e($githubUrl) ?>"
+        placeholder="https://github.com/username/repository"
+    >
+
+    <div class="form-text">
+        Optional. Enter your project's GitHub repository link.
+    </div>
+</div>
+
+<div class="mb-4">
+    <div class="form-check">
+        <input
+            type="checkbox"
+            id="is_featured"
+            name="is_featured"
+            value="1"
+            class="form-check-input"
+            <?= $isFeatured === 1 ? 'checked' : '' ?>
+        >
+
+        <label for="is_featured" class="form-check-label">
+            Featured Project
+        </label>
+    </div>
+
+    <div class="form-text">
+        Show this project in the featured projects section.
+    </div>
+</div>
 
             <div class="mb-4">
                 <label class="form-label">Current Project Image</label>

@@ -3,6 +3,12 @@
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
 
+// Only Super Admin can delete projects.
+if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+    http_response_code(403);
+    exit('Access denied. Only Super Admin can delete projects.');
+}
+
 // Only accept valid POST deletion requests.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['delete'])) {
     header('Location: view-projects.php');

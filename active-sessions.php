@@ -1,6 +1,15 @@
-
 <?php
 require_once __DIR__ . '/includes/auth.php';
+
+// Only Super Admin can access Active Sessions.
+if (
+    !isset($_SESSION['admin_role']) ||
+    $_SESSION['admin_role'] !== 'super_admin'
+) {
+    http_response_code(403);
+    exit('Access Denied: You are not authorized to access this page.');
+}
+
 require_once __DIR__ . '/includes/db.php';
 
 // Expire sessions with no activity for 30 minutes.
@@ -44,7 +53,7 @@ function e($value): string
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Active Sessions | MyPortfolio Admin</title>
+    <title>Active Sessions | MyPortfolio Admin Panel</title>
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"

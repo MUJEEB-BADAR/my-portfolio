@@ -191,9 +191,25 @@ section[id] {
 }
 
 .hero-title {
-    font-size: clamp(3rem, 7vw, 5.5rem);
-    letter-spacing: -3px;
+    font-size: clamp(2.5rem, 5vw, 4.2rem);
+    letter-spacing: -2px;
+    line-height: 1.15;
     margin: 0;
+}
+
+.hero-title .text-gradient {
+    white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+    .hero-title {
+        font-size: clamp(2.1rem, 8vw, 3rem);
+        letter-spacing: -1.5px;
+    }
+
+    .hero-title .text-gradient {
+        white-space: normal;
+    }
 }
 
 .hero-role {
@@ -1008,4 +1024,503 @@ section[id] {
     .admin-actions {
         flex-wrap: wrap;
     }
+}
+
+
+/* Professional Footer */
+.site-footer {
+    background: #080d1b;
+    border-top: 1px solid rgba(148, 163, 184, 0.14);
+    width: 100%;
+}
+
+.site-footer .footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    width: 100%;
+    text-align: center;
+}
+
+.site-footer .footer-copyright {
+    width: 100%;
+    text-align: center;
+}
+
+.site-footer .footer-copyright p {
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+.site-footer .footer-copyright span {
+    color: #8492a8;
+    font-size: 0.8rem;
+    display: block;
+    text-align: center;
+}
+
+.site-footer .footer-socials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    width: 100%;
+}
+
+.site-footer .footer-socials .social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+    background: rgba(19, 27, 49, 0.75);
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: background 0.25s ease,
+                color 0.25s ease,
+                border-color 0.25s ease,
+                transform 0.25s ease;
+}
+
+.site-footer .footer-socials .social-link:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, #5b8cff, #8056d9);
+    border-color: transparent;
+    transform: translateY(-3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-footer .footer-socials .social-link {
+        transition: none;
+    }
+
+    .site-footer .footer-socials .social-link:hover {
+        transform: none;
+    }
+}
+
+
+/* =================================
+   ABOUT PAGE DESIGN
+================================= */
+
+.about-profile-section {
+    overflow: hidden;
+}
+
+.about-profile-frame {
+    width: min(100%, 340px);
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+}
+
+.about-profile-frame .profile-image {
+    width: 85%;
+    height: 85%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.about-profile-frame .profile-glow {
+    inset: 12%;
+    border-radius: 50%;
+}
+
+.about-image-label {
+    position: absolute;
+    bottom: 35px;
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    background: rgba(13, 20, 39, 0.92);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    backdrop-filter: blur(12px);
+}
+
+.about-image-label i {
+    color: #8b9cff;
+    font-size: 18px;
+}
+
+.about-profile-title {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 750;
+    margin-bottom: 12px;
+}
+
+.about-role-divider {
+    color: #8b9cff;
+    margin: 0 5px;
+}
+
+.about-description {
+    line-height: 1.9;
+    margin-bottom: 17px;
+}
+
+.about-actions {
+    margin-top: 25px;
+}
+
+.about-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.about-highlights div {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 14px;
+    border: 1px solid rgba(139, 156, 255, 0.18);
+    border-radius: 10px;
+    background: rgba(91, 140, 255, 0.07);
+    color: #dce5ff;
+    font-size: 13px;
+}
+
+.about-highlights i {
+    color: #8b9cff;
+    font-size: 17px;
+}
+
+/* Education timeline */
+
+.about-timeline {
+    max-width: 850px;
+    margin: 45px auto 0;
+    position: relative;
+}
+
+.about-timeline::before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    bottom: 20px;
+    left: 25px;
+    width: 2px;
+    background: linear-gradient(#5b8cff, #a855f7);
+    opacity: 0.55;
+}
+
+.about-timeline-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 22px;
+    margin-bottom: 28px;
+}
+
+.about-timeline-icon {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 52px;
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(139, 156, 255, 0.3);
+    border-radius: 15px;
+    background: #131b31;
+    color: #8b9cff;
+    font-size: 21px;
+}
+
+.about-info-card {
+    flex: 1;
+    min-width: 0;
+    padding: 25px;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.about-info-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(139, 156, 255, 0.4);
+}
+
+.about-info-card h3 {
+    font-size: 19px;
+    font-weight: 650;
+    margin: 10px 0;
+}
+
+/* Project experience */
+
+.about-project-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 25px;
+    padding: 32px;
+    border: 1px solid rgba(139, 156, 255, 0.16);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.about-project-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(139, 156, 255, 0.4);
+}
+
+.about-project-icon {
+    flex: 0 0 65px;
+    width: 65px;
+    height: 65px;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #315fbd, #7445b5);
+    color: #fff;
+    font-size: 27px;
+}
+
+.about-project-content {
+    flex: 1;
+}
+
+.about-project-content h3 {
+    font-size: 23px;
+    font-weight: 700;
+    margin: 10px 0 14px;
+}
+
+.about-project-content p {
+    line-height: 1.8;
+}
+
+.about-tech-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 20px;
+}
+
+.about-tech-list span {
+    padding: 7px 13px;
+    border-radius: 7px;
+    border: 1px solid rgba(139, 156, 255, 0.2);
+    background: rgba(91, 140, 255, 0.08);
+    color: #cbd8ff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Certification cards */
+
+.about-cert-card {
+    padding: 27px;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.about-cert-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(139, 156, 255, 0.4);
+}
+
+.about-cert-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 20px;
+    border-radius: 13px;
+    background: rgba(91, 140, 255, 0.12);
+    color: #8b9cff;
+    font-size: 22px;
+}
+
+.about-cert-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.about-cert-card p {
+    line-height: 1.7;
+}
+
+.about-cert-date {
+    display: inline-block;
+    margin-top: 16px;
+    color: #9baeff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+
+@media (max-width: 767px) {
+    .about-profile-title {
+        font-size: 30px;
+    }
+    .about-timeline-item {
+        gap: 13px;
+    }
+    .about-timeline::before {
+        left: 20px;
+    }
+    .about-timeline-icon {
+        flex-basis: 42px;
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+        border-radius: 12px;
+    }
+    .about-info-card {
+        padding: 19px;
+    }
+    .about-project-card {
+        flex-direction: column;
+        padding: 23px;
+    }
+    .about-project-content h3 {
+        font-size: 20px;
+    }
+}
+/* Projects Page Banner */
+.page-banner p {
+    max-width: 600px;
+    margin: 0 auto;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--muted);
+}
+
+
+/* =========================================
+   CONTACT PAGE - PROFESSIONAL DESIGN
+========================================= */
+
+.contact-detail {
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: rgba(96, 165, 250, 0.045);
+    transition: border-color .25s ease,
+                background .25s ease,
+                transform .25s ease;
+}
+
+.contact-detail:hover {
+    border-color: rgba(96, 165, 250, .4);
+    background: rgba(96, 165, 250, .08);
+    transform: translateX(4px);
+}
+
+.contact-detail > i {
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(96, 165, 250, .2);
+    border-radius: 12px;
+    background: rgba(96, 165, 250, .1);
+    font-size: 1.2rem;
+}
+
+.contact-detail h3 {
+    font-size: .95rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.contact-detail p {
+    font-size: .9rem;
+    line-height: 1.6;
+}
+
+.contact-detail a {
+    color: var(--accent);
+    transition: color .2s ease;
+}
+
+.contact-detail a:hover {
+    color: #bfdbfe;
+}
+
+#contact-form {
+    margin-top: 24px;
+}
+
+#contact-form .form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: .9rem;
+}
+
+#contact-form .form-control {
+    min-height: 48px;
+    font-size: .95rem;
+    transition: border-color .2s ease,
+                box-shadow .2s ease;
+}
+
+#contact-form textarea.form-control {
+    min-height: 155px;
+    resize: vertical;
+}
+
+#contact-form .form-control:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, .12);
+}
+
+#contact-form .form-control:focus-visible {
+    outline: none;
+}
+
+#contact-form .btn-accent {
+    min-height: 49px;
+    padding: 12px 25px;
+}
+
+#form-message {
+    border-radius: 12px;
+    font-size: .9rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 575.98px) {
+    .contact-detail {
+        padding: 13px;
+        gap: 12px;
+    }
+
+    .contact-detail > i {
+        flex-basis: 42px;
+        width: 42px;
+        height: 42px;
+    }
+
+    #contact-form .btn-accent {
+        width: 100%;
+    }
+}
+
+/* Contact Information Text Alignment */
+.contact-intro {
+    text-align: justify;
+    text-justify: inter-word;
+    line-height: 1.8;
 }
